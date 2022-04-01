@@ -1,0 +1,20 @@
+name: golang microservice
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup golang
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.18"
+      - name: Install dependencies
+        run: |
+          make install
+      - name: Run Lint
+        run: |
+          make lint
+      - name: Run Test
+        run: |
+          make test
