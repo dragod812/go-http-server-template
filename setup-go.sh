@@ -1,6 +1,6 @@
-wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
-rm -rf /usr/local/go && tar -C /usr/local -xzf go1.17.1.linux-amd64.tar.gz
-rm -rf go1.17.1.linux-amd64.tar.gz
+wget https://golang.org/dl/go1.18.linux-amd64.tar.gz
+rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
+rm -rf go1.18.linux-amd64.tar.gz
 
 # export $GOPATH and add go binary path to $PATH
 mkdir $HOME/go
