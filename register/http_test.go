@@ -75,21 +75,37 @@ func Test_getPageNameFromURL(t *testing.T) {
 		url string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
+		// TODO: Add test cases.
 		{
-			"response check",
+			"Url file name retrieval for write endpoint",
 			args{
 				"/page/write/paddy",
 			},
 			"paddy",
+			false,
+		},
+		{
+			"Url file name retrieval for write endpoint",
+			args{
+				"/page/read/paddy",
+			},
+			"paddy",
+			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getPageNameFromURL(tt.args.url); got != tt.want {
+			got, err := getPageNameFromURL(tt.args.url)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getPageNameFromURL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
 				t.Errorf("getPageNameFromURL() = %v, want %v", got, tt.want)
 			}
 		})

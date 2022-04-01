@@ -2,6 +2,7 @@ package register
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,13 +21,18 @@ const (
 )
 
 var pageHandler = handler.NewPageHandler()
+
 var regExpURLValidator = regexp.MustCompile("^/page/(read|write)/([a-zA-Z0-9]+)$")
 
 func ReadPageHttpHandler(response http.ResponseWriter, request *http.Request) {
 	// cpuprofile, _ := os.Create("readcpuprofile")
 	// pprof.StartCPUProfile(cpuprofile)
 	// defer pprof.StopCPUProfile()
-	pageName := request.URL.Path[len(ReadPath):]
+	pageName, err := getPageNameFromURL(request.URL.Path)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
 	readPageResponse, err := pageHandler.ReadPage(mapper.AdaptPageNameToReadPageRequest(pageName))
 
 	if err != nil {
@@ -50,10 +56,14 @@ func WritePageHttpHandler(response http.ResponseWriter, request *http.Request) {
 	// pprof.StartCPUProfile(cpuprofile)
 	// defer pprof.StopCPUProfile()
 
-	pageName := request.URL.Path[len(WritePath):]
+	pageName, err := getPageNameFromURL(request.URL.Path)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	var page entity.Page
-	err := json.NewDecoder(request.Body).Decode(&page)
+	err = json.NewDecoder(request.Body).Decode(&page)
 	// fmt.Printf("Page: %s\n", page)
 
 	if err != nil {
@@ -73,10 +83,13 @@ func WritePageHttpHandler(response http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func getPageNameFromURL(url string) string {
+func getPageNameFromURL(url string) (string, error) {
 	// regExpURLValidator.
-	pageName := url[len(WritePath):]
-	return pageName
+	m := regExpURLValidator.FindStringSubmatch(url)
+	if m == nil {
+		return "", errors.New("invalid Page Title")
+	}
+	return m[2], nil
 }
 
 func RegisterHTTPHandlers() {
